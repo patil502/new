@@ -1,0 +1,49 @@
+#Replace <userName>
+#Replace <DirectoryName>
+
+
+sudo su
+useradd <userName>
+su - <userName>
+#ssh-keygen -b 2048 -t rsa -f <userName> -C <userName>
+ssh-keygen -b 2048 -t rsa -f <userName> -C <userName> -N ""
+exit
+cd /home/<userName>
+cp <userName> /home/ec2-user/<userName>
+su - <userName>
+mkdir .ssh
+cp <userName>.pub .ssh/<<userName>.pub
+cd .ssh
+cat >authorized_keys < <userName>.pub
+chmod 0700 ~/.ssh
+chmod 0600 ~/.ssh/authorized_keys
+exit
+sudo chown root:root /home/<userName>
+sudo chmod 0755 /home/<userName>
+sudo chmod 777 /home/ec2-user/<userName>
+
+comment below line in /etc/ssh/sshd_config
+#Subsystem sftp /usr/libexec/openssh/sftp-server
+
+Add new line:
+echo -e "Subsystem sftp internal-sftp" >> /etc/ssh/sshd_config
+
+sudo echo -e "Match User <userName> \n ChrootDirectory %h \n ForceCommand internal-sftp \n X11Forwarding no\n AllowTCPForwarding no" >> /etc/ssh/sshd_config
+sudo service sshd restart
+
+mkdir -p /home/<userName>/<DirectoryName>
+mount --bind </var/www/<DirectoryName>> /home/<userName>/<DirectoryName>
+chmod g+s /home/<userName>/<DirectoryName>
+sudo groupadd www
+sudo usermod -G www <userName>
+chown -R <userName>:www /home/<userName>/<DirectoryName>
+setfacl -R -m g:www:7 /home/<userName>/<DirectoryName>
+chmod 775 /home/<userName>/<DirectoryName> -R
+echo -e "</var/www/html> \t\t <mountPoint> \t\t none \t\t bind \t 0 \t 0" >> /etc/fstab
+mount -a
+service sshd restart
+-------------------------------------------------------------------------------
+
+## useradd -m username  --- add user with home directory (if home directory not created)
+##useradd -m -d /PATH/TO/FOLDER USERNAME    --- if home directory not created
+##umount -l </home/<userName>/<DirectoryName>>  --- force fully umount
