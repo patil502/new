@@ -1,0 +1,53 @@
+				Drupal Installation:
+
+Install LAMP Stack first.
+
+Drupal-8.5.6 
+ #cd /var/www/html
+
+Download Drupal:
+ #wget https://ftp.drupal.org/files/projects/drupal-8.5.6.tar.gz
+
+Extract:
+ #tar -xvf drupal-8.5.6.tar.gz
+
+Rename as new name:
+ #mv drupal-8.5.6 <new_name>
+
+ #cd <new_name>/sides
+Give permission :
+ #chmod 777 defaults
+ #cd defaults
+ #cp default.settings.php settings.php
+ #chmod 777 settings.php
+
+-------------------
+Create DB/user/password
+DB Commands:
+ #CREATE DATABASE `DBName`; 
+ #CREATE USER 'UserName'@'%' IDENTIFIED BY 'Password';
+ #grant all privileges on DBName.* to 'UserName'@'%' with grant option;
+ #FLUSH PRIVILEGES;
+-------------------
+Open Browser:
+url: IP/<new_name>
+
+standard >> next >> 
+ enter DBname/DBuser/DBpassword 
+  Advance> host server IP or localhost
+  
+Enter site name:
+ Email ID:
+ Drupal user:
+ Drupal Password:
+ 
+Install.
+----------------
+go to terminal/putty:
+ #cd /var/www/html/<new_name>/sides
+
+ Change the permission:
+ #chmod 775 defaults
+ #cd defaults
+ #chmod 775 settings.php
+----------**********----------------****************------------**********
