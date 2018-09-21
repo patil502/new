@@ -1,0 +1,181 @@
+set similar permission to all files:-
+ chmod --reference=PRESENTREQ68_20180813124918.xlsx *
+ 
+####################################################
+find 30 days old files/ create folder /tar  send to s3
+###################################
+
+#!/bin/bash
+
+date=`/bin/date "+%d-%m-%Y"`
+mkdir -p /home/ec2-user/$date
+find /home/ec2-user/report/ .logs -type f -mtime +30 -print |xargs -I {} cp -p {} /home/ec2-user/$date
+tar -cvf /home/ec2-user/$date.tar.gz /home/ec2-user/$date
+rm -rf $date
+# aws s3 cp <source_file> s3://mybucket/test2.txt
+
+---*----*----*---------*-----*------*----*----*---------*-----*------*----*----*---------*-----*---
+
+#############################################################
+
+clear cache & mentailn log of clear cache
+##########################################################
+
+#!/bin/bash
+
+while true;
+do
+echo "current memory status at `date`"      
+free -m 
+echo ""  
+sync; echo 3 > /proc/sys/vm/drop_caches
+echo "cache cleared at `date`"    
+free -m   
+echo -e "\n\n "    
+sleep 60 
+done
+---------------
+#sh script.sh &>> /var/log/cache.log &
+
+---*----*----*---------*-----*------*----*----*---------*-----*------*----*----*---------*-----*---
+
+#############################################################
+
+LampStack script
+#############################################################
+#AllowOverride All (/var/www)
+#
+#!/bin/bash
+
+echo "Installing LampStack"
+sudo yum update –y
+sudo yum install -y gcc make gcc-c++
+sudo yum install -y php56-mysqlnd php56-gd php56 php56-xml php56-mcrypt php56-mbstring php56-cli mysql56 mysql56-server httpd24
+sudo service httpd start
+sudo chkconfig httpd on
+chkconfig --list httpd
+sudo groupadd www
+sudo usermod -a -G www ec2-user
+sudo usermod -a -G www apache
+sudo chown -R root:www /var/www
+sudo chmod 2775 /var/www
+find /var/www -type d -exec sudo chmod 2775 {} +
+find /var/www -type f -exec sudo chmod 0664 {} +
+#echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+
+sudo service mysqld start
+
+#sudo mysql_secure_installation
+#echo -e "root\nn\nY\nY\nY\nY\n"| sudo mysql_secure_installation
+echo -e "\nY\n<password>\n<password>\nY\nY\nY\nY\n" | mysql_secure_installation
+
+sudo service mysqld stop
+
+sudo chkconfig mysqld on
+sudo usermod -a -G www apache
+sudo chgrp -R www /var/www
+sudo chmod 2775 /var/www
+find /var/www -type d -exec sudo chmod 2775 {} +
+find /var/www -type f -exec sudo chmod 0664 {} +
+
+sudo service httpd restart
+sudo service mysqld start
+
+sudo yum --enablerepo=epel install phpmyadmin -y
+
+sed -i '27 a\Options All \n AllowOverride All \n Require all granted' /etc/httpd/conf.d/phpMyAdmin.conf
+sudo service httpd restart
+sudo service mysqld start
+
+---*----*----*---------*-----*------*----*----*---------*-----*------*----*----*---------*-----*---
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+kill proccess script
+ps -ef | grep your_process_name | grep -v grep | awk '{print $2}' | xargs kill
+
+###############################################################################
+
+---*----*----*---------*-----*------*----*----*---------*-----*------*----*----*---------*-----*---
+
+script to check tomcat service is running or not and send mail if stopped
+****************************************
+#!/bin/bash
+while :
+do
+
+service tomcat7 status > file
+var=`cat file  | grep -o running  ||   cat file | grep -o stopped`
+echo "tomcat service is $var on `date` "
+if [ $var == running ] ;
+then
+echo "no action....."
+
+elif [ $var == stopped ] ;
+then
+echo "service restarted at `date` "
+service tomcat7 restart
+echo -e "Service not running on tomcat server B" | mail -s "tomcat service alert on server B" raunak.jha@appliedcloudcomputing.com
+fi
+
+sleep 300
+done
+
+******************************************************************************************
+******************************************************************************************
+Memory and Disk utilization CloudWatchMonitoringScripts
+******************************************************************************************
+#!/bin/bash
+
+sudo yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https -y
+mkdir -p /home/ec2-user/aws-scripts-mon
+cd /home/ec2-user/aws-scripts-mon
+curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
+unzip CloudWatchMonitoringScripts-1.2.1.zip
+rm CloudWatchMonitoringScripts-1.2.1.zip
+cd aws-scripts-mon
+echo "*/5 * * * * /home/ec2-user/aws-scripts-mon/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used --mem-avail --disk-space-util --disk-path=/ --from-cron" >> /var/spool/cron/root
+crontab -l
+echo "Wailt for 3 minutes...... "
+sleep 180
+./mon-get-instance-stats.pl --recent-hours=12
+sleep 10
+./mon-put-instance-data.pl --mem-util --mem-used --mem-avail --aggregated=only
+
+******************************************************************************************
+###############################################################################
+S3 to s3 copy data 
+
+#!/bin/bash
+
+path=<Enter-path>
+aws s3 cp s3://bqacc/$path s3://sonyliv/$path --recursive --acl bucket-owner-full-control   2>> error.txt
+
+******************************************************************************************
+###############################################################################
+
+Check service status....if not running start service:
+
+#!/bin/bash
+if (( $(ps -ef | grep -v grep | grep httpd | wc -l) > 0 ))
+then
+echo "httpd is running!!!"
+else
+/etc/init.d/httpd start
+fi
+******************************************************************************************
+###############################################################################
+Enter new .pub file into server using Run command.
+
+#!/bin/bash
+echo -e "<Enter .pub file key>" >> /home/ec2-user/.ssh/authorized_keys
+chmod 0700 ~/.ssh
+chmod 0600 ~/.ssh/authorized_keys
+service sshd restart
+******************************************************************************************
+###############################################################################
+
+
+
+
+
+
