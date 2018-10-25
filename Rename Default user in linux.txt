@@ -1,0 +1,19 @@
+set root passwd
+# passwd root
+
+enabled "PermitRootLogin yes" & "PasswordAuthentication yes"
+Login with root & close old username services
+
+# usermod --login new_username old_username
+# groupmod -n new old
+# usermod -d /home/new -m new
+# usermod -c “New Real Name” new
+
+Check password & group file
+#cat /etc/passwd
+#cat /etc/group
+
+delete root password
+# passwd -d root
+
+# service sshd restart
