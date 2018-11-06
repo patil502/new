@@ -7,11 +7,13 @@ Login with root & close old username services
 # usermod --login new_username old_username
 # groupmod -n new old
 # usermod -d /home/new -m new
-# usermod -c ìNew Real Nameî new
+# usermod -c ‚ÄúNew Real Name‚Äù new
 
 Check password & group file
 #cat /etc/passwd
 #cat /etc/group
+
+disabled "PermitRootLogin no" & "PasswordAuthentication no"
 
 delete root password
 # passwd -d root
