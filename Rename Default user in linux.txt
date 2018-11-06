@@ -2,6 +2,8 @@ set root passwd
 # passwd root
 
 enabled "PermitRootLogin yes" & "PasswordAuthentication yes"
+#vim /etc/ssh/sshd_config
+
 Login with root & close old username services
 
 # usermod --login new_username old_username
