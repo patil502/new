@@ -14,9 +14,9 @@ Extract:
 Rename as new name:
  #mv drupal-8.5.6 <new_name>
 
- #cd <new_name>/sides
+ #cd <new_name>/sites
 Give permission :
- #chmod 777 defaults
+ #chmod 777 default
  #cd defaults
  #cp default.settings.php settings.php
  #chmod 777 settings.php
